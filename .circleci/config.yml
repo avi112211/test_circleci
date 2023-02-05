@@ -45,7 +45,8 @@ jobs:
 
             echo "signing..."
             SIGN_OVERRIDES='{"signing_sha1_fingerprint":"$SIGN_FINGERPRINT"}'
-            curl -s --request POST \
+            sign=$(
+              curl -s --request POST \
                 --url "https://staging.appdome.com/api/v1/tasks" \
                 --header "Authorization: $APPDOME_API_TOKEN" \
                 --header 'accept: application/json' \
@@ -53,13 +54,18 @@ jobs:
                 --form action=seal \
                 --form parent_task_id=$task_id \
                 --form overrides="$SIGN_OVERRIDES" >/dev/null
+            )
+            echo $sign
 
             echo "Downloading..."
-            curl -s --request GET \
-            --url "https://staging.appdome.com/api/v1/tasks/$task_id/output" \
-            --header "Authorization: $APPDOME_API_TOKEN" \
-            --header 'Content-Type: application/json' \
-            -o "./app.apk"
+            download=$(
+              curl -s --request GET \
+                --url "https://staging.appdome.com/api/v1/tasks/$task_id/output" \
+                --header "Authorization: $APPDOME_API_TOKEN" \
+                --header 'Content-Type: application/json' \
+                -o "./app.apk"
+            )
+            echo $download
 
           
 
