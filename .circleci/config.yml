@@ -41,8 +41,9 @@ jobs:
             echo $task_id
             task_id="$(echo "$task_id" | jq -r .task_id)"
             echo "task-id: $task_id"
-            sleep 120
+            sleep 80
 
+            echo "signing..."
             SIGN_OVERRIDES='{"signing_sha1_fingerprint":"$SIGN_FINGERPRINT"}'
             curl -s --request POST \
                 --url "https://staging.appdome.com/api/v1/tasks" \
@@ -53,6 +54,7 @@ jobs:
                 --form parent_task_id=$task_id \
                 --form overrides="$SIGN_OVERRIDES" >/dev/null
 
+            echo "Downloading..."
             curl -s --request GET \
             --url "https://staging.appdome.com/api/v1/tasks/$task_id/output" \
             --header "Authorization: $APPDOME_API_TOKEN" \
