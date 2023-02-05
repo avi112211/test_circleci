@@ -22,15 +22,40 @@ jobs:
             pwd
             ls
             apk --no-cache add curl jq
+
             publicLink=$(curl -s --request GET --url "https://fusion.appdome.com/api/v1/upload-link" --header "Authorization: $APPDOME_API_KEY")
             curl -s -X PUT "$(echo "$publicLink" | jq -r .url)" --header 'Content-Type: application/x-compressed-tar' -T "app-release.apk"
             app=$(curl -s --request POST --url "https://fusion.appdome.com/api/v1/upload-using-link" --header "Authorization: $APPDOME_API_KEY" --header 'content-type: multipart/form-data' --form file_name="app-release.apk" --form file_app_id="$(echo "$publicLink" | jq -r .file_id)")
-            echo $app
-            echo "export APP_ID='$app'" >> $BASH_ENV
-      - run:
-          name: "build"
-          command: |
-            echo ${APP_ID}
+            
+            task_id=$(
+              curl -s --request POST \
+                --url "https://fusion.appdome.com/api/v1/tasks" \
+                --header "Authorization: $APPDOME_API_KEY" \
+                --header 'accept: application/json' \
+                --header 'content-type: multipart/form-data' \
+                --form action=fuse \
+                --form fusion_set_id="$FUSION_SET_ID_ANDROID" \
+                --form app_id="$(echo "$app" | jq -r .id)" \
+                jq -r .task_id
+            )
+
+
+            SIGN_OVERRIDES='{"signing_sha1_fingerprint":"$SIGN_FINGERPRINT"}'
+            curl -s --request POST \
+                --url "https://fusion.appdome.com/api/v1/tasks" \
+                --header "Authorization: $APPDOME_API_KEY" \
+                --header 'accept: application/json' \
+                --header 'content-type: multipart/form-data' \
+                --form action=seal \
+                --form parent_task_id=$task_id \
+                --form overrides="$SIGN_OVERRIDES" >/dev/null
+
+            curl -s --request GET \
+            --url "https://fusion.appdome.com/api/v1/tasks/$task_id/output" \
+            --header "Authorization: $APPDOME_API_KEY" \
+            --header 'Content-Type: application/json' \
+            -o "./"
+
           
 
 # Invoke jobs via workflows
@@ -40,12 +65,5 @@ workflows:
     jobs:
       - api-usage
   
-  Appdome fusion:
-    jobs:
-      - build-2secure/appdome_runner:
-          runner: ANDROID_PRIVATE_SIGNING
-          name: "test-android-auto-sign"
-          appFile: https://github.com/avi112211/test_circleci/raw/circleci-project-setup/app-release.apk
-          google-play-signing: false
-          output: app.apk
+  
           
