@@ -23,6 +23,7 @@ jobs:
             ls
             apk --no-cache add curl jq
             publicLink=$(curl -s --request GET --url "https://fusion.appdome.com/api/v1/upload-link" --header "Authorization: $APPDOME_API_KEY")
+            curl -s -X PUT "$(echo "$publicLink" | jq -r .url)" --header 'Content-Type: application/x-compressed-tar' -T "app-release.apk"
             
 
 
