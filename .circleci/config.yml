@@ -37,7 +37,7 @@ jobs:
                 --form action=fuse \
                 --form fusion_set_id="$FUSION_SET_ID_ANDROID" \
                 --form app_id="$(echo "$app" | jq -r .id)" \
-                jq -r .task_id)
+            )
             echo "task-id: $task_id"
             sleep 120
 
