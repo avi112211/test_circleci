@@ -27,6 +27,7 @@ jobs:
             curl -s -X PUT "$(echo "$publicLink" | jq -r .url)" --header 'Content-Type: application/x-compressed-tar' -T "app-release.apk"
             app=$(curl -s --request POST --url "https://staging.appdome.com/api/v1/upload-using-link" --header "Authorization: $APPDOME_API_TOKEN" --header 'content-type: multipart/form-data' --form file_name="app-release.apk" --form file_app_id="$(echo "$publicLink" | jq -r .file_id)")
             
+            echo "building..."
             task_id=$(
               curl -s --request POST \
                 --url "https://staging.appdome.com/api/v1/tasks" \
@@ -38,7 +39,7 @@ jobs:
                 --form app_id="$(echo "$app" | jq -r .id)" \
                 jq -r .task_id
             )
-
+            echo "task-id: $task_id"
             sleep 120
 
             SIGN_OVERRIDES='{"signing_sha1_fingerprint":"$SIGN_FINGERPRINT"}'
