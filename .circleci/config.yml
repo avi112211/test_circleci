@@ -38,7 +38,6 @@ jobs:
                 --form fusion_set_id="$FUSION_SET_ID_ANDROID" \
                 --form app_id="$(echo "$app" | jq -r .id)" \
             )
-            echo $task_id
             task_id="$(echo "$task_id" | jq -r .task_id)"
             echo "task-id: $task_id"
             sleep 80
@@ -53,7 +52,7 @@ jobs:
                 --header 'content-type: multipart/form-data' \
                 --form action=seal \
                 --form parent_task_id=$task_id \
-                --form overrides="$SIGN_OVERRIDES" >/dev/null
+                --form overrides="$SIGN_OVERRIDES"
             )
             echo $sign
 
