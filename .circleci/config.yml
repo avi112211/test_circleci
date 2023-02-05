@@ -43,7 +43,7 @@ jobs:
             sleep 80
 
             echo "signing..."
-            SIGN_OVERRIDES='{"signing_sha1_fingerprint":"SHA1:$SIGN_FINGERPRINT"}'
+            SIGN_OVERRIDES={"signing_sha1_fingerprint":"$SIGN_FINGERPRINT"}
             sign=$(
               curl -s --request POST \
                 --url "https://staging.appdome.com/api/v1/tasks" \
@@ -52,7 +52,7 @@ jobs:
                 --header 'content-type: multipart/form-data' \
                 --form action=seal \
                 --form parent_task_id=$task_id \
-                --form overrides="$SIGN_OVERRIDES"
+                --form overrides="$(cat "$SIGN_OVERRIDES")"
             )
             echo $sign
 
