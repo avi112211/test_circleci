@@ -39,6 +39,7 @@ jobs:
                 jq -r .task_id
             )
 
+            sleep 120
 
             SIGN_OVERRIDES='{"signing_sha1_fingerprint":"$SIGN_FINGERPRINT"}'
             curl -s --request POST \
@@ -54,7 +55,7 @@ jobs:
             --url "https://fusion.appdome.com/api/v1/tasks/$task_id/output" \
             --header "Authorization: $APPDOME_API_TOKEN" \
             --header 'Content-Type: application/json' \
-            -o "./"
+            -o "./app.apk"
 
           
 
