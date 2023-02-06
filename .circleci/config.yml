@@ -44,7 +44,10 @@ jobs:
             sleep 80
 
             echo "signing..."
-            SIGN_OVERRIDES='{"signing_sha1_fingerprint":"$SIGN_FINGERPRINT"}'
+            SIGN_OVERRIDES="{}"
+            echo "aaa $SIGNING_FINGERPRINT"
+            SIGN_OVERRIDES=$(echo $SIGN_OVERRIDES | jq '.signing_sha1_fingerprint |= "'"$SIGNING_FINGERPRINT"'"')
+            echo "bbbb $SIGN_OVERRIDES"
             sign=$(
               curl -s --request POST \
                 --url "https://staging.appdome.com/api/v1/tasks" \
@@ -76,14 +79,7 @@ workflows:
     jobs:
       - api-usage
 
-  Appdome fusion:
-    jobs:
-      - build-2secure/appdome_runner:
-          runner: ANDROID_PRIVATE_SIGNING
-          name: "test-android-auto-sign"
-          appFile: https://github.com/avi112211/test_circleci/raw/circleci-project-setup/app-release.apk
-          google-play-signing: false
-          output: app.apk
+  
   
   
           
