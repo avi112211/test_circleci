@@ -59,6 +59,7 @@ jobs:
                 --form overrides="$(echo "$SIGN_OVERRIDES")"
             )
             echo $sign
+            sleep 80
 
             echo "Downloading..."
             download=$(
@@ -79,7 +80,7 @@ workflows:
     jobs:
       - api-usage
 
-  
+
   
   
           
